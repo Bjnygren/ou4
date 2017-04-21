@@ -22,102 +22,18 @@ typedef struct TableElement{
  *  		the time to find inputs which are often looked up. 
  *	table - a table created as a directional list.
  *  pos	  - the position which is to be moved to the front of the table*/
-//void table_MTF(Table *table, dlist_position pos){
-//
-//	MyTable *t = (MyTable*)table;
-//	if(pos != t->values->head){ //no need to swich if pos is first
-//
-//		dlist_position temp =malloc(sizeof(dlist_position));
-//		temp->next = pos->next;
-//		if(dlist_isEnd(t->values,pos->next) == 0){
-//			TableElement *i;
-//			TableElement *k;
-//			k=dlist_inspect(t->values,pos->next);
-//			i=dlist_inspect(t->values,pos);
-//			
-//			
-//			if (t->cf(i->key,k->key)==0){
-//				temp->next = pos->next;
-//				int key_equal = 1;
-//				while ((key_equal == 1) && (!dlist_isEnd(t->values,temp))){
-//					temp=dlist_next(t->values,temp);
-//					k=dlist_inspect(t->values,temp);
-//					
-//					if (t->cf(i->key,k->key)!=0){
-//						key_equal = 0;
-//					}
-//					
-//				}
-//				
-//			}
-//		}
-//	
-//	
-//	
-////		if(!dlist_isEnd(t->values,temp)){
-////			temp = dlist_next(t->values,temp);
-//			temp->next = temp->next->next;
-//			dlist_position first = malloc(sizeof(dlist_position));
-//			first->next = dlist_first(t->values);
-//			
-////			temp->next=pos->next->next;
-//			pos->next->next = first->next->next;
-//			first->next->next=pos->next;
-//			pos->next = temp->next;
-////			free(temp->next);
-//			free(temp);
-////			free(first->next);
-//			free(first);
-////		}
-//	}
-//}
-	
 void table_MTF(Table *table, dlist_position pos){
 
 	MyTable *t = (MyTable*)table;
 	if(pos != t->values->head){ //no need to swich if pos is first
 
 		dlist_position temp = pos->next;
+		temp = temp->next;
+		dlist_position first = dlist_first(t->values); 
 
-//		if(dlist_isEnd(t->values,pos) == 0){
-//			TableElement *i;
-//			TableElement *k;
-////			k=dlist_inspect(t->values,pos->next);
-//			i=dlist_inspect(t->values,pos);
-//			
-//			
-//			if (t->cf(i->key,k->key)==0){
-//				temp->next = pos->next;
-//				int key_equal = 1;
-//				while ((key_equal == 1) && (!dlist_isEnd(t->values,temp))){
-//					temp=dlist_next(t->values,temp);
-//					k=dlist_inspect(t->values,temp);
-//					
-//					if (t->cf(i->key,k->key)!=0){
-//						key_equal = 0;
-//					}
-//					
-//				}
-//				
-//			}
-//		}
-	
-	
-	
-//		if(!dlist_isEnd(t->values,temp)){
-//			temp = dlist_next(t->values,temp);
-			temp = temp->next;
-			dlist_position first = dlist_first(t->values); 
-			
-//			temp->next=pos->next->next;
-			pos->next->next = first->next;
-			first->next=pos->next;
-			pos->next = temp;
-//			free(temp->next);
-//			free(temp);
-//			free(first->next);
-//			free(first);
-//		}
+		pos->next->next = first->next;
+		first->next=pos->next;
+		pos->next = temp;
 	}
 }	
 	
