@@ -27,7 +27,7 @@ void table_MTF(Table *table, dlist_position pos){
 	MyTable *t = (MyTable*)table;
 	if(pos != t->values->head){ //no need to swich if pos is first
 
-		dlist_position temp=malloc(sizeof(element));
+		dlist_position temp=malloc(sizeof(temp));
 		temp->next = pos->next;
 		if(dlist_isEnd(t->values,pos->next) == 0){
 			TableElement *i;
@@ -37,7 +37,7 @@ void table_MTF(Table *table, dlist_position pos){
 			
 			
 			if (t->cf(i->key,k->key)==0){
-				temp = pos->next;
+				temp->next = pos->next;
 				int key_equal = 1;
 				while ((key_equal == 1) && (!dlist_isEnd(t->values,temp))){
 					temp=dlist_next(t->values,temp);
@@ -55,15 +55,17 @@ void table_MTF(Table *table, dlist_position pos){
 	
 	
 //		if(!dlist_isEnd(t->values,temp)){
-			temp->next = dlist_next(t->values,temp);
-			
-			dlist_position first = dlist_first(t->values);
+//			temp = dlist_next(t->values,temp);
+			temp->next = temp->next->next;
+			dlist_position first = malloc(sizeof(first));
+			first = dlist_first(t->values);
 			
 //			temp->next=pos->next->next;
 			pos->next->next = first->next;
 			first->next=pos->next;
 			pos->next = temp->next;
-			free(temp);
+//			free(temp);
+//			free(first);
 //		}
 	}
 }
