@@ -11,7 +11,7 @@
 #include "array.h"
 #include "arraytable.h"
 
-#define NUM_ELEMENTS 100
+#define NUM_ELEMENTS 500
 
 typedef struct ArrayTable{
 	array *values;
@@ -32,13 +32,12 @@ Table *table_create(CompareFunction *compare_function){
 	ArrayTable *a = calloc(sizeof (ArrayTable),1); //varför argument i den ordningen? vad säger vi här? calloc->0 så 0 == empty, n+1==returned?
 //	if(!a);	//kollar så att a fick allokerat minne, annars skapas inte a??
 //		return NULL;
-	a->values = array_create(2,0,0,NUM_ELEMENTS-1,NUM_ELEMENTS-1); //col 1=index, col2=key, col3=value
+	a->values = array_create(2,0,0,NUM_ELEMENTS,NUM_ELEMENTS); //col 1=index, col2=key, col3=value
 	a->cf = compare_function;
 	if(array_hasValue(a->values,0,0) == 0){
 		a->nrOccupied = 0;
 	}
 	
-	array_setMemHandler(a->values, free);
 	return a;
 }
 
@@ -49,6 +48,7 @@ Table *table_create(CompareFunction *compare_function){
 void table_setKeyMemHandler(Table *table,KeyFreeFunc *freeFunc){
 	ArrayTable *a = (ArrayTable*)table;
 	a->keyFree = freeFunc;
+	array_setMemHandler(a->values,a->keyFree);
 }
 
 /* Install a memory handling function responsible for removing a value when removed from the table
@@ -83,6 +83,7 @@ void table_insert(Table *table, KEY key, VALUE value){
 	while(array_hasValue(a->values,i,0)){ // kolla om det finns dubletter
 		key2 = array_inspectValue(a->values,i,0);
 		if(a->cf(key,key2) == 0){
+			array_setValue(a->values,key,i,0);
 			array_setValue(a->values,value,i,1);
 			key_set = 1;
 			break;
@@ -135,7 +136,7 @@ void table_remove(Table *table, KEY key){
 	ArrayTable *a = (ArrayTable*)table;
 	KEY key2;
 	VALUE value2;
-	
+	const int memsize = sizeof key2; // för att komma runt att memcpy inte gillar (key2, XXX, sizeof(key2)) som arg med -Wall
 	int i = 0;
 	int j = 0;
 	while(array_hasValue(a->values,i,1)){ // söker nyckel
@@ -147,16 +148,12 @@ void table_remove(Table *table, KEY key){
 				value2 = array_inspectValue(a->values,j+1,1);
 				KEY key_move = malloc(sizeof key_move);
 				VALUE value_move = malloc(sizeof value_move);
-				memcpy(key_move, key2, sizeof key2);
-				memcpy(value_move, value2, sizeof value2);
+				memcpy(key_move, key2, memsize);
+				memcpy(value_move, value2, memsize);
 				array_setValue(a->values,key_move,j,0);
 				array_setValue(a->values,value_move,j,1);
-				
-				key_move = NULL;
-				value_move = NULL;
 				j++;
 			}
-			
 			array_setValue(a->values,NULL,j,0);
 			array_setValue(a->values,NULL,j,1);
 			break;
@@ -176,4 +173,3 @@ void table_free(Table *table){
 	array_free(a->values);
 	free(table);
 }
-
