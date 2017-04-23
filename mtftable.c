@@ -27,19 +27,13 @@ void table_MTF(Table *table, dlist_position pos){
 	MyTable *t = (MyTable*)table;
 	if(pos != t->values->head){ //no need to swich if pos is first
 
-		dlist_position temp = pos->next;
-		temp = temp->next;
+		dlist_position temp = pos->next->next;
 		dlist_position first = dlist_first(t->values); 
-
 		pos->next->next = first->next;
 		first->next=pos->next;
 		pos->next = temp;
 	}
-}	
-	
-	
-	
-	
+}		
 
 /* Creates a table.
  *  compare_function - Pointer to a function that is called for comparing
@@ -109,7 +103,6 @@ VALUE table_lookup(Table *table, KEY key) {
 		i=dlist_inspect(t->values,p);
 		if (t->cf(i->key,key)==0){
 			table_MTF(table,p);
-			i=dlist_inspect(t->values,dlist_first(t->values));
 			return i->value;		
 		}
 		p=dlist_next(t->values,p);
