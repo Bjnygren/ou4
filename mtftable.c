@@ -27,52 +27,13 @@ void table_MTF(Table *table, dlist_position pos){
 	MyTable *t = (MyTable*)table;
 	if(pos != t->values->head){ //no need to swich if pos is first
 
-		dlist_position temp=malloc(sizeof(dlist_position));
-		temp->next = pos->next;
-		if(dlist_isEnd(t->values,pos->next) == 0){
-			TableElement *i;
-			TableElement *k;
-			k=dlist_inspect(t->values,pos->next);
-			i=dlist_inspect(t->values,pos);
-			
-			
-			if (t->cf(i->key,k->key)==0){
-				temp->next = pos->next;
-				int key_equal = 1;
-				while ((key_equal == 1) && (!dlist_isEnd(t->values,temp))){
-					temp=dlist_next(t->values,temp);
-					k=dlist_inspect(t->values,temp);
-					
-					if (t->cf(i->key,k->key)!=0){
-						key_equal = 0;
-					}
-					
-				}
-				
-			}
-		}
-	
-	
-	
-//		if(!dlist_isEnd(t->values,temp)){
-//			temp = dlist_next(t->values,temp);
-			temp->next = temp->next->next;
-			dlist_position first = malloc(sizeof(dlist_position));
-			first->next = dlist_first(t->values);
-			
-//			temp->next=pos->next->next;
-			pos->next->next = first->next->next;
-			first->next->next=pos->next;
-			pos->next = temp->next;
-//			free(temp->next);
-			free(temp);
-//			free(first->next);
-			free(first);
-//		}
+		dlist_position temp = pos->next->next;
+		dlist_position first = dlist_first(t->values); 
+		pos->next->next = first->next;
+		first->next=pos->next;
+		pos->next = temp;
 	}
-}
-	
-	
+}		
 
 /* Creates a table.
  *  compare_function - Pointer to a function that is called for comparing
@@ -142,7 +103,6 @@ VALUE table_lookup(Table *table, KEY key) {
 		i=dlist_inspect(t->values,p);
 		if (t->cf(i->key,key)==0){
 			table_MTF(table,p);
-			i=dlist_inspect(t->values,dlist_first(t->values));
 			return i->value;		
 		}
 		p=dlist_next(t->values,p);
